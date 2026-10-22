@@ -202,6 +202,7 @@ docker compose up -d --build
 ## 📚 Technical Documentation Directory
 
 For deep-dive technical reviews:
+- 🏗️ [**Project Structure & Developer Guide**](docs/PROJECT_STRUCTURE.md)
 - 📐 [**System Architecture & Flow Diagrams**](docs/ARCHITECTURE.md)
 - 🔌 [**REST API Endpoint Reference**](docs/API_DOCUMENTATION.md)
 - 🚀 [**Production Deployment Guide (Linux, Nginx, Systemd, SSL)**](docs/DEPLOYMENT_GUIDE.md)
