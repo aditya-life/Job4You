@@ -1,0 +1,55 @@
+services:
+  # MySQL 8.0 Production Database
+  db:
+    image: mysql:8.0
+    container_name: job4you-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_production_password_2026
+      MYSQL_DATABASE: job4you
+      MYSQL_USER: job4you_user
+      MYSQL_PASSWORD: job4you_secure_pass_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/mysql_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/seed_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  # Python FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: job4you-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=mysql+pymysql://job4you_user:job4you_secure_pass_2026@db:3306/job4you
+      - SECRET_KEY=job4you-production-super-secret-jwt-key-2026
+      - BYPASS_OTP=True
+      - DEMO_OTP=123456
+      - PORT=8000
+    ports:
+      - "8000:8000"
+
+  # React Frontend (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: job4you-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql_data:
